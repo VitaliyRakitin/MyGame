@@ -16,7 +16,7 @@ void Brick::init(std:: string file_img_name, Vec2 coord, bool in_orientation, Ga
     size = brick->getContentSize();
     coordinates = coord;
     real_coordinates = game->to_real_coordinates(coordinates);
-    brick->setScale(game->cell_size*2/size.x);
+    brick->setScale(game->field.cell_size*2/size.x);
     brick->setPosition(real_coordinates);
     
     orientation = in_orientation;
@@ -72,6 +72,7 @@ void Brick::move_to(Point position){
 
 /* переместить объект в данную точку и фискирует */
 void Brick::move_and_fix(Point position){
+    is_touchble = false;
     brick->setPosition(position);
     real_coordinates = position;
 }
@@ -79,4 +80,9 @@ void Brick::move_and_fix(Point position){
 /* переместить объект на первоночальное место */
 void Brick::move_back(){
     brick->setPosition(real_coordinates);
+}
+
+/* узнать ориентацию */
+bool Brick::getOrientation(){
+    return orientation;
 }

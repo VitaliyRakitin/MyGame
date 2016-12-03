@@ -7,6 +7,7 @@
 //
 
 #include "Game.h"
+
 USING_NS_CC;
 
 /* создаём сцену */
@@ -30,29 +31,8 @@ bool Game::init(){
     {
         return false;
     }
-    
-    auto visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
-    /* find real position of the scene */
-    Vec2 real_center = Vec2(visibleSize.width/2+origin.x, (visibleSize.height)/2+origin.y);
-    
-    /* размер клетки */
-    cell_size = visibleSize.height/CELL_AMOUNT;
-    
-    /* позиция клетки (0,0) */
-    first_position = Vec2(real_center.x - CELL_AMOUNT/2 * cell_size , real_center.y - CELL_AMOUNT/2 * cell_size);
-    
     /* создадим поле */
-    desk = Sprite::create(FIELD_FILE_NAME);
-    desk->setPosition(real_center);
-    desk_size = desk->getContentSize();
-    
-    /* Подгоним поле под размер экрана */
-    desk->setScale(visibleSize.height/desk_size.y);
-    
-    // add desk as a child to this layer
-    this->addChild(desk, 0);
+    field.init(this);
     
     /* в начале ничего не двигаем */
     is_moving = Vec2(TYPE_NONE,TYPE_NONE);
@@ -65,8 +45,7 @@ bool Game::init(){
     /* добавим стенку слева вне поля */
     real_bricks_amount = 0;
     bricks.resize(BRICKS_AMOUNT);
-    bricks[real_bricks_amount].init(BRICK_IMG, Vec2(-2, 4.5), UPRIGHT_BRICK_ORIENTATION, this);
-    real_bricks_amount++;
+    add_brick();
     
     /* для считывания нажатий */
     auto listener = EventListenerTouchAllAtOnce::create();
@@ -79,16 +58,24 @@ bool Game::init(){
     return true;
 }
 
+/* добавим стенку слева вне поля */
+void Game::add_brick(){
+    if (real_bricks_amount< BRICKS_AMOUNT){
+        bricks[real_bricks_amount].init(BRICK_IMG, Vec2(-2, 4.5), UPRIGHT_BRICK_ORIENTATION, this);
+        real_bricks_amount++;
+    }
+}
+
 /* перевод из глобальных координат в координаты поля */
 Vec2 Game::to_local_coordinates(cocos2d::Vec2 real_coordinates){
-    return Vec2((real_coordinates.x - first_position.x)/cell_size,
-                (real_coordinates.y - first_position.y)/cell_size);
+    return Vec2((real_coordinates.x - field.first_position.x)/field.cell_size,
+                (real_coordinates.y - field.first_position.y)/field.cell_size);
 }
 
 /* перевод из координат поля в глобальные */
 Vec2 Game::to_real_coordinates(cocos2d::Vec2 local_coordinates){
-    return Vec2(first_position.x + local_coordinates.x * cell_size,
-                first_position.y + local_coordinates.y * cell_size);
+    return Vec2(field.first_position.x + local_coordinates.x * field.cell_size,
+                field.first_position.y + local_coordinates.y * field.cell_size);
 }
 
 /* преобразуем touch object в точку в глобальных координатах */
@@ -106,20 +93,60 @@ bool Game::isTouchingBrick(Touch* touch, size_t brick_number)
 /* проверка на то, что нажимаем на игрока */
 bool Game::isTouchingPlayer(Touch* touch, size_t player_number)
 {
-    return (players[player_number].getDistance(touchToPoint(touch)) < (cell_size/2));
+    return (players[player_number].getDistance(touchToPoint(touch)) < (field.cell_size/2));
+}
+
+/* проверяем, что ход игрока возможен */
+bool Game::isGoodStepPlayer(int x,int y){
+    
+    /* проверим, что мы сделали шаг только на 1 клетку вдоль вертикали или горизонтали*/
+    Vec2 start_coord = players[is_moving.y].getPosition();
+    Vec2 finish_coord = to_real_coordinates(Vec2(x,y));
+    Vec2 dist =finish_coord -start_coord;
+    
+    /* двигаемся вертикально */
+    if ((dist.x<1)&&(dist.x>-1)){
+        if ((dist.y > 1)&&(dist.y < field.cell_size + 1)){
+            /* пришли снизу сделав шаг в 1 клетку */
+            log("down %d, %d",x,y);
+            return field.field_matrix[x][y].down;
+            
+        }
+        if ((dist.y < -1)&&(-dist.y < field.cell_size + 1)){
+            /* пришли сверху сделав шаг в 1 клетку */
+            log("up %d, %d",x,y);
+            return field.field_matrix[x][y].up;
+        }
+    }
+    if ((dist.y<1)&&(dist.y > - 1)){
+        if ((dist.x > 1)&&(dist.x < field.cell_size + 1)){
+            /* пришли слева сделав шаг в 1 клетку */
+            log("right %d, %d",x,y);
+            return field.field_matrix[x][y].left;
+        }
+        if ((dist.x < -1)&&(-dist.x < field.cell_size + 1)){
+            /* пришли справа сделав шаг в 1 клетку */
+            log("left %d, %d",x,y);
+            return field.field_matrix[x][y].right;
+        }
+    }
+    return false;
 }
 
 /* находим подходящую позицию на поле для игрока */
 void Game::move_to_best_place_player(Touch* touch){
     float x,y;
+    
+    
     Vec2 position = touchToPoint(touch) + touchOffset;
-    x = (position.x - first_position.x)/cell_size;
-    y = (position.y - first_position.y)/cell_size;
-    if ((x > CELL_AMOUNT)||(y>CELL_AMOUNT)||(x<0)||(y<0)){
-        players[is_moving.y].move_back();
+    x = (position.x - field.first_position.x)/field.cell_size + 0.5;
+    y = (position.y - field.first_position.y)/field.cell_size + 0.5;
+    
+    if ((x < CELL_AMOUNT)&&(y < CELL_AMOUNT)&&(x > 0)&&(y > 0)&&(isGoodStepPlayer(x,y))){
+        players[is_moving.y].move_and_fix(to_real_coordinates(Vec2(int(x),int(y))));
     }
     else{
-        players[is_moving.y].move_and_fix(to_real_coordinates(Vec2(int(x+0.5),int(y+0.5))));
+        players[is_moving.y].move_back();
     }
 }
 
@@ -127,13 +154,15 @@ void Game::move_to_best_place_player(Touch* touch){
 void Game::move_to_best_place_brick(Touch* touch){
     float x,y;
     Vec2 position = touchToPoint(touch) + touchOffset;
-    x = (position.x - first_position.x - cell_size/2)/cell_size;
-    y = (position.y - first_position.y - cell_size/2)/cell_size;
-    if ((x > CELL_AMOUNT)||(y>CELL_AMOUNT)||(x<0)||(y<0)){
+    x = (position.x - field.first_position.x - field.cell_size/2)/field.cell_size;
+    y = (position.y - field.first_position.y - field.cell_size/2)/field.cell_size;
+    if ((x > CELL_AMOUNT-2)||(y>CELL_AMOUNT-2)||(x<0)||(y<0)){
         bricks[is_moving.y].move_back();
     }
     else{
         bricks[is_moving.y].move_and_fix(to_real_coordinates(Vec2(int(x+0.5)+0.5,int(y+0.5)+0.5)));
+        add_brick();
+        field.change_passage_opportunity(int(x+0.5)+0.5,int(y+0.5)+0.5,bricks[is_moving.y].getOrientation());
     }
 }
 
@@ -209,3 +238,4 @@ void Game::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
     /* заончили перетаскивать */
     is_moving = Vec2(TYPE_NONE,TYPE_NONE);
 }
+

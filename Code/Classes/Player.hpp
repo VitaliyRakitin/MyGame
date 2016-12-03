@@ -22,7 +22,7 @@ using namespace cocos2d;
 class Player: public cocos2d:: Sprite{
 private:
     Sprite* player;
-    Vec2 coordinates;
+   // Vec2 coordinates;
     Vec2 real_coordinates;
     
 public:

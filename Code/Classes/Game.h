@@ -13,9 +13,11 @@
 
 #include <stdio.h>
 #include <vector>
+#include <math.h>
 #include "cocos2d.h"
 #include "Player.hpp"
 #include "Brick.hpp"
+#include "Field.hpp"
 
 
 #define FIELD_FILE_NAME "desk.png"
@@ -45,11 +47,11 @@ private:
     Vec2 is_moving; // 0,0 -- nothing, 1,N --- N brick, 2,K --- K player
     
     Point touchOffset;
+    
+    bool isGoodStepPlayer(int x, int y);
 
 public:
-    Vec2 desk_size;
-    float cell_size;
-    Vec2 first_position;
+    Field field;
     
     Game(){};
     ~Game(){};
@@ -78,7 +80,10 @@ public:
     Vec2 to_local_coordinates(cocos2d::Vec2 real_coordinates);
     Vec2 to_real_coordinates(cocos2d::Vec2 real_coordinates);
     
+    void add_brick();
+    
     CREATE_FUNC(Game);
+
 };
 
 

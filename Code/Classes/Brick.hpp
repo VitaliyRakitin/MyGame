@@ -48,7 +48,7 @@ public:
     void move_to(Point position);
     void move_and_fix(Point position);
     void move_back();
-
+    bool getOrientation();
 };
 
 

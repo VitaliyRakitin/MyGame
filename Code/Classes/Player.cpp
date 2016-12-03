@@ -15,9 +15,9 @@ void Player::init(std:: string file_img_name, Vec2 coord, Game* game){
     is_touchble = true;
     player = Sprite::create(file_img_name);
     size = player->getContentSize();
-    coordinates = coord;
-    player->setScale(game->cell_size/size.y);
-    real_coordinates = game->to_real_coordinates(coordinates);
+    //coordinates = coord;
+    player->setScale(game->field.cell_size/size.y);
+    real_coordinates = game->to_real_coordinates(coord);
     player->setPosition(real_coordinates);
     game->addChild(player,2);
 }
