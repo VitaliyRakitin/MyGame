@@ -158,7 +158,7 @@ void Game::move_to_best_place_brick(Touch* touch){
     y = int((position.y - field.first_position.y - field.cell_size/2)/field.cell_size + 0.5) + 0.5;
     
     //log("x = %lf, y = %lf",x,y);
-    if ((x > CELL_AMOUNT-1)||(y>CELL_AMOUNT-1)||(x<0)||(y<0)||!isGoodStepBrick(x,y)){
+    if ((x > CELL_AMOUNT-1)||(y>CELL_AMOUNT-1)||(x<0)||(y<0)||!isGoodStepBrick(x,y,bricks[is_moving.y].getOrientation())){
         bricks[is_moving.y].move_back();
     }
     else{
@@ -248,7 +248,7 @@ void Game::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
     is_moving = Vec2(TYPE_NONE,TYPE_NONE);
 }
 
-
+/*
 bool Game::isGoodStepBrick(float x,float y){
     Vec2 position = Vec2(x,y);
     log("orientation: %d", bricks[real_bricks_amount].getOrientation());
@@ -257,6 +257,27 @@ bool Game::isGoodStepBrick(float x,float y){
         dist = bricks[i].getDistance(to_real_coordinates(position));
         if (dist < 1 && dist > -1){
             return false;
+        }
+    }
+    return true;
+}
+*/
+bool Game::isGoodStepBrick(float x,float y, bool orientation){
+    Vec2 position = Vec2(x,y);
+    float dist;
+    for (int i=0; i<real_bricks_amount; i++){
+        dist = bricks[i].getDistance(to_real_coordinates(position));
+        if (dist < 1 && dist > -1){
+            return false;
+        }
+        else{
+            if ((orientation == 0) && (bricks[i].getOrientation() == 0) && (std::abs(position.y - to_local_coordinates(bricks[i].getPosition()).y) < 1.5) && (std::abs(position.x - to_local_coordinates(bricks[i].getPosition()).x) < 0.5)){
+                log("!!!!!!!!!!!!");
+                return false;
+            }
+            if ((orientation == 1) && (bricks[i].getOrientation() == 1) && (std::abs(position.y - to_local_coordinates(bricks[i].getPosition()).y) < 0.5) && (std::abs(position.x - to_local_coordinates(bricks[i].getPosition()).x) < 1.5)){
+                return false;
+            }
         }
     }
     return true;
