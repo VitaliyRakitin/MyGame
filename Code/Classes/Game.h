@@ -49,6 +49,7 @@ private:
     Point touchOffset;
     
     bool isGoodStepPlayer(int x, int y);
+    bool isGoodStepBrick(float x,float y);
 
 public:
     Field field;

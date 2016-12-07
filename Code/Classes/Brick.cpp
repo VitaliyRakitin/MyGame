@@ -14,8 +14,8 @@ void Brick::init(std:: string file_img_name, Vec2 coord, bool in_orientation, Ga
     
     brick = Sprite::create(file_img_name);
     size = brick->getContentSize();
-    coordinates = coord;
-    real_coordinates = game->to_real_coordinates(coordinates);
+    //coordinates = coord;
+    real_coordinates = game->to_real_coordinates(coord);
     brick->setScale(game->field.cell_size*2/size.x);
     brick->setPosition(real_coordinates);
     
@@ -37,6 +37,7 @@ void Brick::init(std:: string file_img_name, Vec2 coord, bool in_orientation, Ga
 Point Brick::getPosition(){
     return real_coordinates;
 }
+
 
 /* возвращает расстояние точки фиксации объекта до данной */
 float Brick::getDistance(Point touch){

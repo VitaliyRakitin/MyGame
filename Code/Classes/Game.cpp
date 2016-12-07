@@ -108,25 +108,25 @@ bool Game::isGoodStepPlayer(int x,int y){
     if ((dist.x<1)&&(dist.x>-1)){
         if ((dist.y > 1)&&(dist.y < field.cell_size + 1)){
             /* пришли снизу сделав шаг в 1 клетку */
-            log("down %d, %d",x,y);
+            //log("down %d, %d",x,y);
             return field.field_matrix[x][y].down;
             
         }
         if ((dist.y < -1)&&(-dist.y < field.cell_size + 1)){
             /* пришли сверху сделав шаг в 1 клетку */
-            log("up %d, %d",x,y);
+            //log("up %d, %d",x,y);
             return field.field_matrix[x][y].up;
         }
     }
     if ((dist.y<1)&&(dist.y > - 1)){
         if ((dist.x > 1)&&(dist.x < field.cell_size + 1)){
             /* пришли слева сделав шаг в 1 клетку */
-            log("right %d, %d",x,y);
+            //log("right %d, %d",x,y);
             return field.field_matrix[x][y].left;
         }
         if ((dist.x < -1)&&(-dist.x < field.cell_size + 1)){
             /* пришли справа сделав шаг в 1 клетку */
-            log("left %d, %d",x,y);
+            //log("left %d, %d",x,y);
             return field.field_matrix[x][y].right;
         }
     }
@@ -136,7 +136,7 @@ bool Game::isGoodStepPlayer(int x,int y){
 /* находим подходящую позицию на поле для игрока */
 void Game::move_to_best_place_player(Touch* touch){
     float x,y;
-    
+
     
     Vec2 position = touchToPoint(touch) + touchOffset;
     x = (position.x - field.first_position.x)/field.cell_size + 0.5;
@@ -154,15 +154,17 @@ void Game::move_to_best_place_player(Touch* touch){
 void Game::move_to_best_place_brick(Touch* touch){
     float x,y;
     Vec2 position = touchToPoint(touch) + touchOffset;
-    x = (position.x - field.first_position.x - field.cell_size/2)/field.cell_size;
-    y = (position.y - field.first_position.y - field.cell_size/2)/field.cell_size;
-    if ((x > CELL_AMOUNT-2)||(y>CELL_AMOUNT-2)||(x<0)||(y<0)){
+    x = int((position.x - field.first_position.x - field.cell_size/2)/field.cell_size + 0.5) + 0.5;
+    y = int((position.y - field.first_position.y - field.cell_size/2)/field.cell_size + 0.5) + 0.5;
+    
+    //log("x = %lf, y = %lf",x,y);
+    if ((x > CELL_AMOUNT-1)||(y>CELL_AMOUNT-1)||(x<0)||(y<0)||!isGoodStepBrick(x,y)){
         bricks[is_moving.y].move_back();
     }
     else{
-        bricks[is_moving.y].move_and_fix(to_real_coordinates(Vec2(int(x+0.5)+0.5,int(y+0.5)+0.5)));
+        bricks[is_moving.y].move_and_fix(to_real_coordinates(Vec2(x,y)));
         add_brick();
-        field.change_passage_opportunity(int(x+0.5)+0.5,int(y+0.5)+0.5,bricks[is_moving.y].getOrientation());
+        field.change_passage_opportunity(x,y,bricks[is_moving.y].getOrientation());
     }
 }
 
@@ -235,7 +237,27 @@ void Game::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
             }
         }
     }
+    
+ /*   log("real_bricks_amount = %zu", real_bricks_amount);
+    for (int i=0;i<real_bricks_amount;i++){
+        Vec2 coord = to_local_coordinates(bricks[i].getPosition());
+        log("%d: x = %lf, y = %lf",i,coord.x, coord.y);
+    }
+   */ 
     /* заончили перетаскивать */
     is_moving = Vec2(TYPE_NONE,TYPE_NONE);
 }
 
+
+bool Game::isGoodStepBrick(float x,float y){
+    Vec2 position = Vec2(x,y);
+    log("orientation: %d", bricks[real_bricks_amount].getOrientation());
+    float dist;
+        for (int i=0; i<real_bricks_amount; i++){
+        dist = bricks[i].getDistance(to_real_coordinates(position));
+        if (dist < 1 && dist > -1){
+            return false;
+        }
+    }
+    return true;
+}

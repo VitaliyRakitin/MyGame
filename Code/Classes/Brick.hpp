@@ -28,7 +28,7 @@ class Brick: public cocos2d:: Sprite{
 private:
     Sprite* brick;
     bool orientation; // true --- horizontally, false --- upright
-    Vec2 coordinates;
+    //Vec2 coordinates;
     Vec2 real_coordinates;
     Vec2 size;
 public:
@@ -44,6 +44,7 @@ public:
     float getDistance(Point touch);
     bool checkDistance(Point touch);
     Point getPosition();
+    
     void change_orientation();
     void move_to(Point position);
     void move_and_fix(Point position);
