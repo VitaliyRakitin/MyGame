@@ -32,7 +32,7 @@ public:
     Player(const Player&){};
     ~Player(){
         CC_SAFE_RELEASE_NULL(player);};
-    void init(std:: string file_img_name, Vec2 coord,Game* game);
+    void init(std:: string file_img_name, Vec2 coord,bool touchble,Game* game);
 
     float getDistance(Point touch);
     Point getPosition();

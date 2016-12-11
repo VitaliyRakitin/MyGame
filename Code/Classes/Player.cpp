@@ -10,9 +10,9 @@
 #include "Game.h"
 
 /* инициализация */
-void Player::init(std:: string file_img_name, Vec2 coord, Game* game){
+void Player::init(std:: string file_img_name, Vec2 coord, bool touchble, Game* game){
     Vec2 size;
-    is_touchble = true;
+    is_touchble = touchble;
     player = Sprite::create(file_img_name);
     size = player->getContentSize();
     //coordinates = coord;

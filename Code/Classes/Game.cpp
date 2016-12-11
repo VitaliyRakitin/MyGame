@@ -39,8 +39,8 @@ bool Game::init(){
     
     /* добавим игроков */
     players.resize(PLAYERS_AMOUNT);
-    players[0].init(PLAYER_1_IMG, Vec2(4,0),this);
-    players[1].init(PLAYER_2_IMG, Vec2(4,8),this);
+    players[0].init(PLAYER_1_IMG, Vec2(4,0),true,this);
+    players[1].init(PLAYER_2_IMG, Vec2(4,8),false,this);
     
     /* добавим стенку слева вне поля */
     real_bricks_amount = 0;
@@ -234,6 +234,14 @@ void Game::onTouchesEnded(const std::vector<Touch*>& touches, Event* event)
             }
             if(is_moving.x == TYPE_PLAYER){
                 move_to_best_place_player(touch);
+                if (is_moving.y == 0){
+                    players[0].is_touchble = false;
+                    players[1].is_touchble = true;
+                }
+                if (is_moving.y == 1){
+                    players[1].is_touchble = false;
+                    players[0].is_touchble = true;
+                }
             }
         }
     }
