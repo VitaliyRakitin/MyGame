@@ -8,11 +8,15 @@
 
 #include "Game.h"
 
+
 Cell::Cell(){
     up = true;
     down = true;
     left = true;
     right = true;
+    dist = -1;
+    prev = Vec2(-1,-1);
+    next = Vec2(-1,-1);
 }
 
 /* построим матрицу в конструкторе */

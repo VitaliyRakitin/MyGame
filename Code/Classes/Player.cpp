@@ -20,6 +20,7 @@ void Player::init(std:: string file_img_name, Vec2 coord, bool touchble, Game* g
     real_coordinates = game->to_real_coordinates(coord);
     player->setPosition(real_coordinates);
     game->addChild(player,2);
+    wallPlaced = 0;
 }
 
 /* возвращает глобальные координаты объекта в данный момент */

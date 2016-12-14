@@ -23,6 +23,9 @@ public:
     bool right;
     bool up;
     bool down;
+    int dist;//расстояние от текущего положения игрока, для алгоритма Дейкстры
+    Vec2 prev;
+    Vec2 next;
     Cell();
 };
 

@@ -26,6 +26,7 @@ private:
     Vec2 real_coordinates;
     
 public:
+    int wallPlaced;
     bool is_touchble;
     
     Player(){};

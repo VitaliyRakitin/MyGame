@@ -21,8 +21,8 @@
 
 
 #define FIELD_FILE_NAME "desk.png"
-#define PLAYER_1_IMG "player1.png"
-#define PLAYER_2_IMG "player2.png"
+#define PLAYER_1_IMG "player5.png"
+#define PLAYER_2_IMG "player6.png"
 #define BRICK_IMG "brick.png"
 #define CELL_AMOUNT 9
 #define BRICKS_AMOUNT 10
@@ -45,6 +45,10 @@ private:
     std::vector<Brick> bricks;
     size_t real_bricks_amount;
     Vec2 is_moving; // 0,0 -- nothing, 1,N --- N brick, 2,K --- K player
+    Label* MyLabelPlayer1;
+    Label* MyLabelPlayer2;
+
+    std::vector<Label*> PlayersCount;
     
     Point touchOffset;
     
@@ -52,6 +56,7 @@ private:
     bool isGoodStepBrick(float x,float y, bool orientation);
 public:
     Field field;
+    int playerNumber;
     
     Game(){};
     ~Game(){};
@@ -81,6 +86,12 @@ public:
     Vec2 to_real_coordinates(cocos2d::Vec2 real_coordinates);
     
     void add_brick();
+    
+    
+    void changePlayer();
+    
+    bool DeikstraForPlayerInit(size_t player_number, Vec2 next_pos);
+    void DeikstraForPlayerStep(Vec2 next, Vec2 prev, int total_dist);
     
     CREATE_FUNC(Game);
 
